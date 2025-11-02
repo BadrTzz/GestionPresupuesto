@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Gestor de gastos - Cliente web básico</title>
+</head>
+<body>
+  <h1>Gestor de gastos: cliente web básico</h1>
+
+  
+  <div>
+    <h3>Total de gastos: <span id="total">0</span> €</h3>
+  </div>
+
+ 
+  <div id="formulario">
+    <h3>Crear gasto</h3>
+    <form id="formGasto">
+      <label>Descripción:
+        <input type="text" id="descripcion" required>
+      </label><br>
+      <label>Valor (€):
+        <input type="number" id="valor" step="0.01" required>
+      </label><br>
+      <label>Fecha:
+        <input type="date" id="fecha">
+      </label><br>
+      <label>Etiquetas (separadas por comas):
+        <input type="text" id="etiquetas">
+      </label><br>
+      <button type="submit">Añadir gasto</button>
+    </form>
+  </div>
+
+ 
+  <div id="listado">
+    <h3>Listado de gastos</h3>
+    <ul id="listaGastos"></ul>
+  </div>
+
+  
+  <script type="module" src="js/gestionPresupuestoWebV1.js"></script>
+</body>
+</html>
