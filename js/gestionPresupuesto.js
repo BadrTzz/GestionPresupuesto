@@ -135,6 +135,10 @@ function agruparGastos(periodo, etiquetas = [], fechaDesde = null, fechaHasta = 
   return resultado;
 }
 
+function sobrescribirGastos(nuevos) {
+  gastos = nuevos;
+  contadorIds = gastos.length > 0 ? Math.max(...gastos.map(g => g.id)) + 1 : 0; 
+}
 export {
   actualizarPresupuesto,
   mostrarPresupuesto,
@@ -145,5 +149,6 @@ export {
   calcularTotalGastos,
   calcularBalance,
   filtrarGastos,
-  agruparGastos
+  agruparGastos,
+  sobrescribirGastos
 };
