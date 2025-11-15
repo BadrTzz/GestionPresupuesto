@@ -39,7 +39,7 @@ const lista = document.getElementById("listaGastos");
 const total = document.getElementById("total");
 
 // template del componenete <mi-gasto> contien  la estructura HTML y susstilos encapsulados
-const  template = document.createElement("template");//creacion del elemento <template>
+const template = document.createElement("template");//creacion del elemento <template>
 template.innerHTML = `
   <style>
     :host {
@@ -88,6 +88,7 @@ template.innerHTML = `
     <button type="button" id="cancelarBtn">Cancelar</button>
   </form>
 `;
+
 //la definicion del componente web de <mi-gasto>
 class MiGasto extends HTMLElement{
     constructor(){
@@ -105,10 +106,12 @@ class MiGasto extends HTMLElement{
     _render(){
         //metodo para mostrar la informacion del gasto 
         const gasto = this.gasto;
+
         // obtencion de los elementos del shadow dom 
         const descEl = this._shadow.getElementById("desc")
         const valEl = this._shadow.getElementById("valor")
         const detEl = this._shadow.getElementById("detalle")
+
         // formatea la fecha a formato local  dia/mes/año
         const fechalocal = new Date(gasto.fecha).toLocaleDateString();
 
@@ -116,46 +119,58 @@ class MiGasto extends HTMLElement{
         descEl.textContent = gasto.descripcion;
         valEl.textContent = gasto.valor;
         detEl.textContent = `${fechalocal} · ${gasto.etiquetas.join(", ")}`;
+
         //referencia   de los botones e formulareos de edicion dentro del shadow dom 
         const borrarBtn = this._shadow.getElementById("borrarBtn");
         const editarBtn = this._shadow.getElementById("editarBtn");
         const formEditar = this._shadow.getElementById("formEditar");
         const cancelarBtn = this._shadow.getElementById("cancelarBtn");
 
+        editarBtn.onclick = () => {
+          formEditar.style.display = "block";
+
+          this._shadow.getElementById("descEdit").value = gasto.descripcion;
+          this._shadow.getElementById("valorEdit").value = gasto.valor;
+          this._shadow.getElementById("fechaEdit").value = 
+            new Date(gasto.fecha).toISOString().split("T")[0];
+          this._shadow.getElementById("etiqEdit").value = gasto.etiquetas.join(", ");
+        }
+
         //boton de borrar 
         borrarBtn.onclick = () => {
             borrarGasto(gasto.id);// elimina el gasto de la lista general
-            document.dispatchEvent(new Event("gastoAcutalizado"));// lanza un evento  para avisar al resto  de la app de los  cambios que hay 
+            document.dispatchEvent(new Event("gastoActualizado"));// lanza un evento  para avisar al resto  de la app de los  cambios que hay 
         };
+
         //boton para  cancelar
-        cancelarBtn.onclick= () =>  (formEditar.style.display = "none");// oculta el formulario sin guardar cambios 
+        cancelarBtn.onclick = () => (formEditar.style.display = "none");// oculta el formulario sin guardar cambios 
 
         // envio del formulartio de edicion 
         formEditar.onsubmit = e =>{
             e.preventDefault(); // evita recargar la pagina 
         
             //actualizamos las propiedades del objeto gasto
-        gasto.descripcion = this._shadow.getElementById("descEdit").value.trim();
-        gasto.valor = parseFloat(this._shadow.getElementById("valorEdit").value);
-        gasto.fecha = Date.parse(this._shadow.getElementById("fechaEdit").value);
-        gasto.etiquetas = this._shadow
-        .getElementById("etiqEdit")
-        .value.split(",") //Separanos las etiquetas por comas
-        .map((e) => e.trim()) //quitamos los espacions 
-        .filter(Boolean); //Eliminamos vacias 
+            gasto.descripcion = this._shadow.getElementById("descEdit").value.trim();
+            gasto.valor = parseFloat(this._shadow.getElementById("valorEdit").value);
+            gasto.fecha = Date.parse(this._shadow.getElementById("fechaEdit").value);
+            gasto.etiquetas = this._shadow
+                .getElementById("etiqEdit")
+                .value.split(",")
+                .map((e) => e.trim())
+                .filter(Boolean);
 
-        formEditar.style.display = "none"; //ocultamos el formulario de edicion 
-        document.dispatchEvent(new Event("gastoActualizado"));//avisa a la app que se a actualizado  un gasto
+            formEditar.style.display = "none";
+            document.dispatchEvent(new Event("gastoActualizado"));
         };
     }
 }
+
 //registr el nuebo elemento personalizado de <mi-gasto>
 customElements.define("mi-gasto", MiGasto);
 
 function renderizarGasto(){
     lista.innerHTML = ""; // se limpia la lista actual 
     listarGastos().forEach(g => {
-        //Recorremos todos los gastos existentes
         const li = document.createElement("li");//creamos un elemento li para cada gasto
         const comp = document.createElement("mi-gasto");//crea una instancia del componente personalizado 
         comp.setAttribute("data-gasto", JSON.stringify(g));//le pasamos los datos del gasto como atributo
@@ -168,21 +183,23 @@ function renderizarGasto(){
 
 form.addEventListener("submit", (e) => {
     e.preventDefault();//evita el comportamiento por defecto  osea recargar pagina 
-    //creamos un nuevo objeto gasto con los datos del  formulario
+
     const nuevo = new CrearGasto(
         descripcion.value.trim(),//descripcion limpia
         parseFloat(valor.value),//valor convertido a  numero 
-        fecha.value || new Date().toISOString(), //si no hay fecha se usa la actual
-        ...etiquetas.value.split(",").map(e => e.trim()).filter(Boolean) // separa etiquetas por comas 
-        );
+        fecha.value || new Date().toISOString(),
+        ...etiquetas.value.split(",").map(e => e.trim()).filter(Boolean)
+    );
 
-        anyadirGasto(nuevo);//añadimos el gasto al array global de gastos
-        guardarGastosLocal();
-        form.reset();//limpia el fromulario
-        renderizarGasto(); //volvemos a mostrar los gastos actualizados 
+    anyadirGasto(nuevo);//añadimos el gasto al array global de gastos
+    guardarGastosLocal();
+    form.reset();//limpia el fromulario
+    renderizarGasto(); //volvemos a mostrar los gastos actualizados 
 });
+
 // cuando se dispara el evento personalizado de gastoactualizado recargamos la lista 
 document.addEventListener("gastoActualizado", renderizarGasto);
+
 //mostramos los gastos iniciale si hay 
 renderizarGasto();
 
@@ -190,9 +207,7 @@ document.getElementById("btnGuardar").addEventListener("click", () => {
   guardarGastosLocal();
 })
 
-
 document.getElementById("btnCargar").addEventListener("click", () => {
   cargarGastosLocal();
   renderizarGasto();
 })
-
