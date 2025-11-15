@@ -10,12 +10,12 @@ import {
 
 const CLAVE_STORAGE = "mis_gastos";
 
-function guardarGastos() {
+function guardarGastosLocal() {
   const datos = JSON.stringify(listarGastos());
   localStorage.setItem(CLAVE_STORAGE, datos);
 }
 
-function cargarGastoslocal() {
+function cargarGastosLocal() {
   const datos = localStorage.getItem(CLAVE_STORAGE);
   if(!datos) return;
 
@@ -115,7 +115,7 @@ class MiGasto extends HTMLElement{
         // se inserta la informacion en el HTML del componente
         descEl.textContent = gasto.descripcion;
         valEl.textContent = gasto.valor;
-        detEl.textContent = '${fechalocal} · ${gasto.etiquetas.join}(", ")';
+        detEl.textContent = `${fechalocal} · ${gasto.etiquetas.join(", ")}`;
         //referencia   de los botones e formulareos de edicion dentro del shadow dom 
         const borrarBtn = this._shadow.getElementById("borrarBtn");
         const editarBtn = this._shadow.getElementById("editarBtn");
@@ -177,6 +177,7 @@ form.addEventListener("submit", (e) => {
         );
 
         anyadirGasto(nuevo);//añadimos el gasto al array global de gastos
+        guardarGastosLocal();
         form.reset();//limpia el fromulario
         renderizarGasto(); //volvemos a mostrar los gastos actualizados 
 });
@@ -185,4 +186,13 @@ document.addEventListener("gastoActualizado", renderizarGasto);
 //mostramos los gastos iniciale si hay 
 renderizarGasto();
 
+document.getElementById("btnGuardar").addEventListener("click", () => {
+  guardarGastosLocal();
+})
+
+
+document.getElementById("btnCargar").addEventListener("click", () => {
+  cargarGastosLocal();
+  renderizarGasto();
+})
 
