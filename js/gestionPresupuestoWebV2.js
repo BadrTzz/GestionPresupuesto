@@ -15,6 +15,19 @@ function guardarGastos() {
   localStorage.setItem(CLAVE_STORAGE, datos);
 }
 
+function cargarGastoslocal() {
+  const datos = localStorage.getItem(CLAVE_STORAGE);
+  if(!datos) return;
+
+  const listaPlanos = JSON.parse(datos);
+
+  const reconstruidos = listaPlanos.map(g => {
+    const obj = new CrearGasto(g.descripcion, g.valor, g.fecha, ...g.etiquetas);
+    obj.id = g.id;
+    return obj;
+  });
+  sobrescribirGastos(reconstruidos);
+}
 
 //Obtiene referencias a los  elementos del dom
 const form = document.getElementById("formGasto");
