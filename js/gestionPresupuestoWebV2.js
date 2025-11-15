@@ -5,7 +5,16 @@ import {
     listarGastos,
     borrarGasto,
     calcularTotalGastos,
+    sobrescribirGastos
 } from "./gestionPresupuesto.js"
+
+const CLAVE_STORAGE = "mis_gastos";
+
+function guardarGastos() {
+  const datos = JSON.stringify(listarGastos());
+  localStorage.setItem(CLAVE_STORAGE, datos);
+}
+
 
 //Obtiene referencias a los  elementos del dom
 const form = document.getElementById("formGasto");
